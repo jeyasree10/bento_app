@@ -1,4 +1,3 @@
-import 'package:bento_app/screens/auth/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:bento_app/firebase_options.dart';
@@ -48,7 +47,7 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> pages = const [
     DashboardPage(userName: "User"),
     CartPage(),
-    TrackingPage(),
+    TrackingPage(orderId: "dummy"),
     SeatPage(),
     ProfilePage(),
   ];

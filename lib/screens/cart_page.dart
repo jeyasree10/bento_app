@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../services/cart_service.dart';
 import '../services/order_service.dart';
 
@@ -57,7 +60,7 @@ class CartPage extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          /// 🍔 NAME + PRICE
+                          /// ITEM DETAILS
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -77,10 +80,9 @@ class CartPage extends StatelessWidget {
                             ],
                           ),
 
-                          /// ➕➖ QTY CONTROL
+                          /// QUANTITY CONTROLS
                           Row(
                             children: [
-                              /// ➖
                               IconButton(
                                 onPressed: () {
                                   cartService.decreaseQty(item['name']);
@@ -88,14 +90,11 @@ class CartPage extends StatelessWidget {
                                 icon: const Icon(Icons.remove_circle,
                                     color: Colors.orange),
                               ),
-
                               Text(
                                 "${item['qty']}",
                                 style: const TextStyle(
                                     color: Colors.white, fontSize: 16),
                               ),
-
-                              /// ➕
                               IconButton(
                                 onPressed: () {
                                   cartService.addToCart(
@@ -107,7 +106,7 @@ class CartPage extends StatelessWidget {
                             ],
                           ),
 
-                          /// ❌ DELETE
+                          /// DELETE
                           IconButton(
                             onPressed: () {
                               cartService.removeItem(item['name']);
@@ -143,16 +142,17 @@ class CartPage extends StatelessWidget {
                         Text(
                           "₹$total",
                           style: const TextStyle(
-                              color: Colors.orange,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
+                            color: Colors.orange,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
 
                     const SizedBox(height: 15),
 
-                    /// PLACE ORDER BUTTON
+                    /// 🚀 PLACE ORDER
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -164,13 +164,59 @@ class CartPage extends StatelessWidget {
                           ),
                         ),
                         onPressed: () async {
-                          await orderService.placeOrder(cartItems, total);
-                          await cartService.clearCart();
+                          final user = FirebaseAuth.instance.currentUser;
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Order Placed Successfully ✅")),
-                          );
+                          /// ❌ NOT LOGGED IN
+                          if (user == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Please login first")),
+                            );
+                            return;
+                          }
+
+                          try {
+                            /// 🔥 FETCH USER DATA FROM FIRESTORE
+                            final userDoc = await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(user.uid)
+                                .get();
+
+                            /// 🔥 SAFETY CHECK
+                            if (!userDoc.exists) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("User data not found ❌")),
+                              );
+                              return;
+                            }
+
+                            final userData = userDoc.data()!;
+                            final userName = userData['name'] ?? "Guest";
+
+                            print("REAL USER NAME: $userName");
+
+                            /// 🔥 PLACE ORDER
+                            await orderService.placeOrder(
+                              userName: userName,
+                              cartItems: cartItems,
+                              total: total,
+                            );
+
+                            await cartService.clearCart();
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Order Placed Successfully ✅"),
+                              ),
+                            );
+                          } catch (e) {
+                            print("ORDER ERROR: $e");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Something went wrong ❌")),
+                            );
+                          }
                         },
                         child: const Text(
                           "Place Order",

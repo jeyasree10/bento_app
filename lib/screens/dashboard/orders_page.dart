@@ -224,7 +224,8 @@ class _OrdersPageState extends State<OrdersPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const TrackingPage()),
+                MaterialPageRoute(
+                    builder: (_) => const TrackingPage(orderId: "dummy")),
               );
             },
             child: const Text("Track Order"),

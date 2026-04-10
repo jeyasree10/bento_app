@@ -29,7 +29,7 @@ class _MainNavigationState extends State<MainNavigation> {
       DashboardPage(userName: widget.userName),
       MenuPage(),
       CartPage(),
-      TrackingPage(),
+      TrackingPage(orderId: "dummy"),
       SeatPage(),
     ];
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../main_navigation.dart';
 import 'signup_page.dart';
 
@@ -13,6 +14,45 @@ class _LoginPageState extends State<LoginPage> {
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   bool _obscure = true;
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passCtrl.dispose();
+    super.dispose();
+  }
+
+  /// 🔥 LOGIN FUNCTION
+  Future<void> loginUser() async {
+    try {
+      final userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailCtrl.text.trim(),
+        password: _passCtrl.text.trim(),
+      );
+
+      final user = userCredential.user;
+
+      print("LOGIN SUCCESS: ${user?.email}");
+
+      String userName = user?.email?.split('@')[0] ?? "User"; // extract name
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MainNavigation(userName: userName),
+        ),
+      );
+    } catch (e) {
+      print("LOGIN ERROR: $e");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Login Failed ❌ Check email/password"),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,14 +110,12 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 30),
 
-                  /// 🔥 GOOGLE BUTTON
+                  /// 🔥 GOOGLE BUTTON (DISABLED)
                   OutlinedButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              MainNavigation(userName: "Google User"),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Use Email Login for now"),
                         ),
                       );
                     },
@@ -143,18 +181,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   /// 🔥 LOGIN BUTTON
                   ElevatedButton(
-                    onPressed: () {
-                      String userName = _emailCtrl.text.isEmpty
-                          ? "User"
-                          : _emailCtrl.text.split('@')[0];
-
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => MainNavigation(userName: userName),
-                        ),
-                      );
-                    },
+                    onPressed: loginUser,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
                       padding: const EdgeInsets.symmetric(vertical: 14),

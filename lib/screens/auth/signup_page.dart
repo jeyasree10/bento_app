@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'login_page.dart';
-import '../dashboard/dashboard_page.dart';
+import '../main_navigation.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -20,10 +23,65 @@ class _SignupPageState extends State<SignupPage> {
   bool _obscurePass = true;
   bool _obscureConfirm = true;
 
+  /// 🔥 SIGNUP FUNCTION (NEW)
+  Future<void> signupUser() async {
+    try {
+      if (_nameCtrl.text.isEmpty ||
+          _emailCtrl.text.isEmpty ||
+          _passCtrl.text.isEmpty ||
+          _confirmCtrl.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please fill all fields")),
+        );
+        return;
+      }
+
+      if (_passCtrl.text != _confirmCtrl.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Passwords do not match")),
+        );
+        return;
+      }
+
+      /// 🔥 CREATE USER IN FIREBASE AUTH
+      final userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailCtrl.text.trim(),
+        password: _passCtrl.text.trim(),
+      );
+
+      final user = userCredential.user;
+
+      /// 🔥 SAVE USER DATA IN FIRESTORE
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        "name": _nameCtrl.text.trim(),
+        "email": _emailCtrl.text.trim(),
+        "phone": _phoneCtrl.text.trim(),
+        "roll": _rollCtrl.text.trim(),
+      });
+
+      print("SIGNUP SUCCESS: ${user.email}");
+
+      /// 🔥 GO TO MAIN APP
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MainNavigation(userName: _nameCtrl.text.trim()),
+        ),
+      );
+    } catch (e) {
+      print("SIGNUP ERROR: $e");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1B2A), // Dark Blue
+      backgroundColor: const Color(0xFF0D1B2A),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -31,7 +89,6 @@ class _SignupPageState extends State<SignupPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                /// 🔥 TITLE
                 const Text(
                   "Create Account",
                   textAlign: TextAlign.center,
@@ -44,35 +101,30 @@ class _SignupPageState extends State<SignupPage> {
 
                 const SizedBox(height: 30),
 
-                /// 👤 NAME
                 _buildTextField(
                   controller: _nameCtrl,
                   label: "Full Name",
                   icon: Icons.person,
                 ),
 
-                /// 📧 EMAIL
                 _buildTextField(
                   controller: _emailCtrl,
                   label: "Email",
                   icon: Icons.email,
                 ),
 
-                /// 📱 PHONE
                 _buildTextField(
                   controller: _phoneCtrl,
                   label: "Phone",
                   icon: Icons.phone,
                 ),
 
-                /// 🆔 ROLL NO
                 _buildTextField(
                   controller: _rollCtrl,
                   label: "Roll No",
                   icon: Icons.badge,
                 ),
 
-                /// 🔒 PASSWORD
                 _buildTextField(
                   controller: _passCtrl,
                   label: "Password",
@@ -86,7 +138,6 @@ class _SignupPageState extends State<SignupPage> {
                   },
                 ),
 
-                /// 🔒 CONFIRM PASSWORD
                 _buildTextField(
                   controller: _confirmCtrl,
                   label: "Confirm Password",
@@ -102,40 +153,9 @@ class _SignupPageState extends State<SignupPage> {
 
                 const SizedBox(height: 25),
 
-                /// 🚀 REGISTER BUTTON
+                /// 🚀 REGISTER BUTTON (FIXED)
                 ElevatedButton(
-                  onPressed: () {
-                    if (_nameCtrl.text.isEmpty ||
-                        _emailCtrl.text.isEmpty ||
-                        _passCtrl.text.isEmpty ||
-                        _confirmCtrl.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Please fill all fields"),
-                        ),
-                      );
-                      return;
-                    }
-
-                    if (_passCtrl.text != _confirmCtrl.text) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Passwords do not match"),
-                        ),
-                      );
-                      return;
-                    }
-
-                    /// Navigate to Dashboard
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => DashboardPage(
-                          userName: _nameCtrl.text,
-                        ),
-                      ),
-                    );
-                  },
+                  onPressed: signupUser,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -151,7 +171,6 @@ class _SignupPageState extends State<SignupPage> {
 
                 const SizedBox(height: 20),
 
-                /// 🔁 LOGIN LINK
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -186,7 +205,6 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  /// 🔧 COMMON TEXTFIELD WIDGET
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,

@@ -16,7 +16,7 @@ List<FoodItem> foodList = [
   FoodItem(
     name: "Dosa",
     image:
-        "https://myfoodstory.com/wp-content/uploads/2025/08/Dosa-Recipe-2.jpg",
+        "https://media.istockphoto.com/id/2261611854/photo/homemade-multi-grain-dosa.jpg?s=612x612&w=is&k=20&c=DVcvxGJhb7rmlHbKuqOBkBFkD4Ia9vnG1AQZmoHQaPs=",
     price: "30",
     category: "Breakfast",
   ),
@@ -105,7 +105,8 @@ List<FoodItem> foodList = [
   ),
   FoodItem(
     name: "Veg Biriyani",
-    image: "https://www.bigbasket.com/media/uploads/recipe/w-l/1030_1.jpg",
+    image:
+        "https://media.istockphoto.com/id/1292442851/photo/traditional-hyderabadi-vegetable-veg-dum-biryani-with-mixed-veggies-served-with-mixed-raita.jpg?s=2048x2048&w=is&k=20&c=c37wtHYCYKFOBkAv22hMioLVn7_eGc6VpD4yRQOSLB0=",
     price: "60",
     category: "Lunch",
   ),
@@ -126,14 +127,14 @@ List<FoodItem> foodList = [
   FoodItem(
     name: "Samosa ",
     image:
-        "https://www.indianhealthyrecipes.com/wp-content/uploads/2021/12/samosa-recipe-500x375.jpg",
+        "https://media.istockphoto.com/id/2148933061/photo/selective-focus-samosa-spiced-potato-filled-pastry-crispy-savory-popular-indian-snack-with.jpg?s=2048x2048&w=is&k=20&c=aTAALtTKdMxwp57zdwo1kN_5vWV9_BOOdmOLvlgO3Os=",
     price: "15",
     category: "Snacks",
   ),
   FoodItem(
     name: "Bread pakora",
     image:
-        "https://www.kuchpakrahahai.in/wp-content/uploads/2026/03/bread-pakoda.jpg",
+        "https://media.istockphoto.com/id/1159362267/photo/bread-pakora.jpg?s=612x612&w=is&k=20&c=10Z_crgYZMix8EtsNKaQCo2kygO3FYbGSfIyuu4KBf4=",
     price: "15",
     category: "Snacks",
   ),
@@ -204,13 +205,6 @@ List<FoodItem> foodList = [
     name: "Coca Cola ",
     image:
         "https://www.shutterstock.com/image-photo/nikopol-dnepropetrovsk-regionukraine-july-15-600nw-2493143977.jpg",
-    price: "10",
-    category: "Beverages",
-  ),
-  FoodItem(
-    name: "Sprite",
-    image:
-        "https://image.cdn.shpy.in/474920/SpriteCane-1767469007086.png?format=webp",
     price: "10",
     category: "Beverages",
   ),
@@ -313,13 +307,6 @@ List<FoodItem> foodList = [
     category: "Sandwiches & Wraps",
   ),
   FoodItem(
-    name: "Manchurian Frankie ",
-    image:
-        "https://hlfrankie.com/wp-content/uploads/2024/09/Manchurian-Frankie.png",
-    price: "60",
-    category: "Sandwiches & Wraps",
-  ),
-  FoodItem(
     name: "veg sandwich",
     image:
         "https://media.istockphoto.com/id/1328164559/photo/veg-grilled-sandwich.jpg?s=612x612&w=is&k=20&c=5zPWQrpz9xqn_zj20rmoikwlPFPikSLysqxHhbXbuew=",
@@ -336,14 +323,14 @@ List<FoodItem> foodList = [
   FoodItem(
     name: "Oreo Biscuit(50 g)",
     image:
-        "https://images.jdmagicbox.com/quickquotes/images_main/oreo-chocolate-wafer-biscuits-2181576227-5d7ojqep.jpg",
+        "https://media.istockphoto.com/id/458552725/photo/oreo-cookies.jpg?s=612x612&w=0&k=20&c=Fqx8l0f4alo7-OopsrSc_zKexteBTVSQvIuh1RrSyOM=",
     price: "10",
     category: "Packaged Foods",
   ),
   FoodItem(
     name: "Dairy Milk chocolate",
     image:
-        "https://fbflowerbasket.com/wp-content/uploads/2023/11/5-Cadbury-Dairy-Milk-Chcolates-13.2-gms.jpg",
+        "https://media.istockphoto.com/id/469741712/photo/bar-of-cadbury-dairy-milk-chocolate-2011.jpg?s=2048x2048&w=is&k=20&c=pa16Gfs7gHSyTj2vFdW6BN7gNUTa_fquQRoS8VZiX3o=",
     price: "10",
     category: "Packaged Foods",
   ),
@@ -364,7 +351,7 @@ List<FoodItem> foodList = [
   FoodItem(
     name: "Lays(30 g)",
     image:
-        "https://www.vrindasupermart.in/wp-content/uploads/2021/08/294297_13-lays-potato-chips-calm-cream-onion-flavour-e1628606572899.jpg",
+        "https://media.istockphoto.com/id/458987231/photo/potato-chips.jpg?s=612x612&w=is&k=20&c=8uPCyORZMeHM_vnx4y_RflRkLPH5vvGcuY4IfoVj9Ac=",
     price: "10",
     category: "Packaged Foods",
   ),

@@ -22,6 +22,7 @@ class _MenuPageState extends State<MenuPage> {
     "Snacks",
     "Beverages",
     "Fresh & Chilled Beverages",
+    "Sandwiches & Wraps",
     "Packaged Foods"
   ];
 

@@ -1,77 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:bento_app/firebase_options.dart';
+import 'firebase_options.dart';
 import 'screens/auth/login_page.dart';
-// Screens
-import 'screens/dashboard/dashboard_page.dart';
-import 'screens/cart_page.dart';
-import 'screens/dashboard/tracking_page.dart';
-import 'screens/dashboard/seat_page.dart';
-import 'screens/dashboard/profile_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // 🔥 MUST INITIALIZE FIREBASE
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  runApp(const MyApp());
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const BentoApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class BentoApp extends StatelessWidget {
+  const BentoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Bento Master',
-      theme: ThemeData.dark(),
-      home: const LoginPage(),
-    );
-  }
-}
-
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
-
-  @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
-  int _index = 0;
-
-  final List<Widget> pages = const [
-    DashboardPage(userName: "User"),
-    CartPage(),
-    TrackingPage(orderId: "dummy"),
-    SeatPage(),
-    ProfilePage(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: pages[_index],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _index,
-        onTap: (value) {
-          setState(() {
-            _index = value;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.menu), label: "Menu"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.delivery_dining), label: "Track"),
-          BottomNavigationBarItem(icon: Icon(Icons.event_seat), label: "Seat"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        ],
+      title: 'BENTO',
+      theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFF0D1B2A),
+        colorScheme: const ColorScheme.dark(primary: Colors.orange),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF0D1B2A),
+          elevation: 0,
+          titleTextStyle: TextStyle(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Color(0xFF1B263B),
+          selectedItemColor: Colors.orange,
+          unselectedItemColor: Colors.grey,
+          type: BottomNavigationBarType.fixed,
+        ),
       ),
+      home: const LoginPage(),
     );
   }
 }

@@ -1,220 +1,124 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../services/order_service.dart';
+import '../auth/login_page.dart';
 
-class TrackingPage extends StatefulWidget {
-  final String orderId;
-
-  const TrackingPage({super.key, required this.orderId});
-
-  @override
-  State<TrackingPage> createState() => _TrackingPageState();
-}
-
-class _TrackingPageState extends State<TrackingPage> {
-  int seconds = 0;
-  Timer? timer;
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
-
-  /// 🔥 START TIMER
-  void startTimer(int prepMinutes) {
-    timer?.cancel();
-    seconds = prepMinutes * 60;
-
-    timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (seconds > 0) {
-        setState(() {
-          seconds--;
-        });
-      } else {
-        t.cancel();
-      }
-    });
-  }
-
-  String formatTime(int sec) {
-    int min = sec ~/ 60;
-    int s = sec % 60;
-    return "${min.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}";
-  }
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+  static const _bg = Color(0xFF0D1B2A);
+  static const _card = Color(0xFF1B263B);
 
   @override
   Widget build(BuildContext context) {
-    print("🔥 TRACKING PAGE ID: ${widget.orderId}");
-
+    final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1B2A),
+      backgroundColor: _bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0D1B2A),
-        title: const Text("Tracking"),
+        title: const Text('My Profile'),
         centerTitle: true,
-      ),
-      body: StreamBuilder<Map<String, dynamic>>(
-        stream: OrderService().getOrderById(widget.orderId),
-        builder: (context, snapshot) {
-          /// 🔄 LOADING
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          /// ❌ ERROR
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text("Error loading order",
-                  style: TextStyle(color: Colors.white)),
-            );
-          }
-
-          /// ❌ NO DATA
-          if (!snapshot.hasData || snapshot.data == null) {
-            print("❌ ORDER DATA NULL");
-            return const Center(
-              child: Text(
-                "Order not found",
-                style: TextStyle(color: Colors.white),
-              ),
-            );
-          }
-
-          final order = snapshot.data!;
-          print("✅ ORDER DATA: $order");
-
-          final status = order['status'] ?? "Accepted";
-          final token = order['token'] ?? "";
-          final prepTime = order['prepTime'] ?? "0";
-
-          /// 🔥 START TIMER WHEN PREP TIME EXISTS
-          if (prepTime != "" && seconds == 0) {
-            startTimer(int.tryParse(prepTime) ?? 0);
-          }
-
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                /// 🔥 TOKEN
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Text(
-                    "Token No: $token",
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                /// 🔥 STATUS STEPS
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildStep("Accepted", status),
-                    _buildLine(status, "Accepted"),
-                    _buildStep("Preparing", status),
-                    _buildLine(status, "Preparing"),
-                    _buildStep("Ready", status),
-                    _buildLine(status, "Ready"),
-                    _buildStep("Completed", status),
-                  ],
-                ),
-
-                const SizedBox(height: 40),
-
-                /// 🔥 ESTIMATED TIME
-                Container(
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Text(
-                    "Estimated Time: $prepTime mins",
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                /// 🔥 LIVE TIMER
-                Container(
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text("Live Time",
-                          style: TextStyle(color: Colors.white)),
-                      const SizedBox(height: 5),
-                      Text(
-                        formatTime(seconds),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  /// 🔥 STEP LOGIC
-  Widget _buildStep(String step, String status) {
-    bool active = _isActive(step, status);
-
-    return Row(
-      children: [
-        Icon(
-          Icons.check_circle,
-          color: active ? Colors.green : Colors.grey,
-        ),
-        const SizedBox(width: 10),
-        Text(
-          step,
-          style: TextStyle(
-            color: active ? Colors.orange : Colors.grey,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.orange),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginPage()),
+                    (_) => false);
+              }
+            },
           ),
-        ),
-      ],
+        ],
+      ),
+      body: user == null
+          ? const Center(
+              child:
+                  Text('Not logged in', style: TextStyle(color: Colors.white)))
+          : FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(user.uid)
+                  .get(),
+              builder: (ctx, snap) {
+                final data = snap.data?.data() as Map<String, dynamic>?;
+                final name =
+                    data?['name'] ?? user.email?.split('@')[0] ?? 'User';
+                final email = data?['email'] ?? user.email ?? '–';
+                final phone = data?['phone'] ?? '–';
+                final roll = data?['roll'] ?? '–';
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(children: [
+                    const SizedBox(height: 20),
+                    CircleAvatar(
+                      radius: 44,
+                      backgroundColor: Colors.orange,
+                      child: Text(name.isNotEmpty ? name[0].toUpperCase() : 'U',
+                          style: const TextStyle(
+                              fontSize: 36,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(name,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Text(email,
+                        style: const TextStyle(
+                            color: Colors.orange, fontSize: 13)),
+                    const SizedBox(height: 28),
+                    _row('📱', 'Phone', phone),
+                    const SizedBox(height: 10),
+                    _row('🎓', 'Roll No', roll),
+                    const SizedBox(height: 10),
+                    _row('✉️', 'Email', email),
+                    const SizedBox(height: 28),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.logout),
+                        label: const Text('Sign Out'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade700,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
+                          if (context.mounted) {
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const LoginPage()),
+                                (_) => false);
+                          }
+                        },
+                      ),
+                    ),
+                  ]),
+                );
+              }),
     );
   }
 
-  Widget _buildLine(String status, String step) {
-    bool active = _isActive(step, status);
-
-    return Container(
-      margin: const EdgeInsets.only(left: 10),
-      height: 30,
-      width: 2,
-      color: active ? Colors.green : Colors.grey,
-    );
-  }
-
-  /// 🔥 STATUS FLOW
-  bool _isActive(String step, String status) {
-    const steps = ["Accepted", "Preparing", "Ready", "Completed"];
-    return steps.indexOf(step) <= steps.indexOf(status);
-  }
+  Widget _row(String emoji, String label, String value) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        decoration: BoxDecoration(
+            color: _card, borderRadius: BorderRadius.circular(12)),
+        child: Row(children: [
+          Text(emoji, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: 12),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label,
+                style: const TextStyle(color: Colors.grey, fontSize: 11)),
+            Text(value,
+                style: const TextStyle(color: Colors.white, fontSize: 14)),
+          ]),
+        ]),
+      );
 }

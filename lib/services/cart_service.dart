@@ -71,7 +71,7 @@ class CartService {
     int total = 0;
 
     for (var item in cartItems) {
-      total += (item['price'] * item['qty']) as int;
+      total += ((item["price"] as num) * (item["qty"] as num)).toInt();
     }
 
     return total;
